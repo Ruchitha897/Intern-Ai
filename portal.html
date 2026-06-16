@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Intern Flow AI - Interactive Candidate Sync & Calibration Portal">
+  <title>Intern Flow AI // Candidate Calibration Core</title>
+  <!-- Google Fonts: Orbitron for futuristic titles, Outfit for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional custom adjustments for portal page */
+    .portal-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .portal-card {
+      width: 100%;
+      max-width: 520px;
+      height: auto;
+      min-height: 480px;
+      margin: auto;
+      padding: 28px;
+    }
+    .portal-title {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .portal-title h1 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--text-primary);
+      text-shadow: 0 0 10px var(--neon-primary);
+    }
+    .portal-title span {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 5px;
+      color: var(--neon-primary);
+    }
+    .portal-details {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .portal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 10px;
+    }
+    .portal-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .portal-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+    }
+    .portal-value {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-align: right;
+    }
+    .portal-value.highlight-cyan {
+      color: var(--neon-primary);
+      font-weight: 700;
+      text-shadow: 0 0 5px rgba(0, 240, 255, 0.4);
+    }
+    .portal-value.highlight-teal {
+      color: var(--neon-success);
+      font-weight: 700;
+      text-shadow: 0 0 5px rgba(5, 255, 161, 0.4);
+    }
+    .portal-status-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      transition: var(--transition-smooth);
+    }
+    .status-pending {
+      background: rgba(255, 189, 0, 0.08);
+      border: 1px solid var(--neon-warning);
+      color: var(--neon-warning);
+      box-shadow: 0 0 10px rgba(255, 189, 0, 0.15);
+    }
+    .status-confirmed {
+      background: rgba(5, 255, 161, 0.08);
+      border: 1px solid var(--neon-success);
+      color: var(--neon-success);
+      box-shadow: 0 0 15px rgba(5, 255, 161, 0.25);
+    }
+    .btn-calibrate {
+      height: 52px;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      border-radius: 10px;
+      transition: var(--transition-smooth);
+    }
+    .btn-calibrate.calibrated {
+      border-color: var(--neon-success);
+      color: var(--neon-success);
+      background: rgba(5, 255, 161, 0.1);
+      cursor: default;
+      box-shadow: 0 0 10px rgba(5, 255, 161, 0.2);
+    }
+    .btn-calibrate.calibrated:hover {
+      background: rgba(5, 255, 161, 0.1);
+      color: var(--neon-success);
+      box-shadow: 0 0 10px rgba(5, 255, 161, 0.2);
+    }
+    .portal-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .portal-footer a {
+      color: var(--neon-primary);
+      text-decoration: none;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .portal-footer a:hover {
+      color: var(--text-primary);
+      text-shadow: 0 0 5px var(--neon-primary);
+    }
+  </style>
+</head>
+<body data-theme-engine="purple">
+
+  <!-- Background Canvas for Stars, Parallax Dust, and Orbiting Icons -->
+  <canvas id="space-canvas"></canvas>
+
+  <!-- Scanlines & Vignette Layer for CRT Hologram Look -->
+  <div class="hologram-overlay"></div>
+
+  <!-- Audio Initialization Overlay (for browser security compliance) -->
+  <div id="audio-auth-modal" class="audio-modal hidden">
+    <div class="audio-modal-content">
+      <i data-lucide="radio" class="audio-pulse-icon"></i>
+      <h2>Initialize Neuro-Audio Core?</h2>
+      <p>Activate portal confirmation synthesized deep space ambience and telemetry sound cues.</p>
+      <div class="audio-modal-buttons">
+        <button id="btn-audio-enable" class="btn-neon">INITIALIZE PORTAL SOUND</button>
+        <button id="btn-audio-skip" class="btn-neon btn-secondary">MUTE MODE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="portal-container">
+    <div class="dashboard-card portal-card" id="card-portal" data-bob-phase="0">
+      
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="card-title">
+          <i data-lucide="network" class="card-icon pulsing-glow"></i>
+          <h2>CANDIDATE INTERFACE</h2>
+        </div>
+        <span class="card-tag tag-pink">SYNC CORE</span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        
+        <!-- Portal Header Brand -->
+        <div class="portal-title">
+          <h1 id="portal-greeting" class="glow-text">WELCOME, APPLICANT</h1>
+          <span>NEURAL SYNCHRONIZER</span>
+        </div>
+
+        <!-- Portal Status Badge -->
+        <div id="status-badge" class="portal-status-badge status-pending">
+          <i data-lucide="orbit" class="icon-spin-hover"></i>
+          <span id="status-text">PENDING NEURO-CALIBRATION</span>
+        </div>
+
+        <!-- Portal Information Details -->
+        <div class="portal-details">
+          <div class="portal-row">
+            <span class="portal-label">SYNC STATE</span>
+            <span class="portal-value" id="val-sync-state">OFFLINE (UNCONFIRMED)</span>
+          </div>
+          <div class="portal-row">
+            <span class="portal-label">INTERVIEW TYPE</span>
+            <span class="portal-value highlight-cyan" id="val-interview-type">TECHNICAL CODING SESSION</span>
+          </div>
+          <div class="portal-row">
+            <span class="portal-label">INTERVIEWER</span>
+            <span class="portal-value" id="val-interviewer">ELENA ROSTOVA</span>
+          </div>
+          <div class="portal-row">
+            <span class="portal-label">CALIBRATION DATE</span>
+            <span class="portal-value highlight-teal" id="val-interview-date">JUNE 9, 2026</span>
+          </div>
+          <div class="portal-row">
+            <span class="portal-label">SYNCHRONIZATION TIME</span>
+            <span class="portal-value highlight-teal" id="val-interview-time">13:00 // GMT-5</span>
+          </div>
+        </div>
+
+        <!-- Calibration Confirmation Button -->
+        <button id="btn-calibrate-sync" class="btn-neon btn-block btn-calibrate">
+          <i data-lucide="refresh-cw" class="icon-spin-hover"></i> CALIBRATE NEURO-SYNC CORE
+        </button>
+
+        <!-- Back Link / Footer Links -->
+        <div class="portal-footer">
+          <span>Intern Flow AI v2.8</span>
+          <a href="/" id="btn-back-dashboard"><i data-lucide="chevron-left"></i> CORE DASHBOARD</a>
+        </div>
+
+      </div>
+      <div class="card-footer-glow"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Lucide icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      /* --- Load State & URL Parameters --- */
+      const urlParams = new URLSearchParams(window.location.search);
+      const interviewId = urlParams.get('id');
+
+      // Load state from localStorage or use fallback mock data
+      const savedStateStr = localStorage.getItem('internflow_state');
+      let state = savedStateStr ? JSON.parse(savedStateStr) : null;
+      let activeInterview = null;
+      let activeCandidate = null;
+
+      if (state && interviewId) {
+        activeInterview = state.interviews.find(i => i.id === interviewId);
+        if (activeInterview) {
+          activeCandidate = state.candidates.find(c => c.id === activeInterview.candidateId);
+        }
+      }
+
+      // Fallback Demo Data if loaded directly or no matching entry
+      if (!activeInterview || !activeCandidate) {
+        console.warn("No active interview ID match in localStorage. Loading demo configuration.");
+        activeCandidate = {
+          name: "Aria Chen",
+          role: "AI Research Intern"
+        };
+        activeInterview = {
+          id: "demo-id",
+          date: "2026-06-12",
+          time: "11:00",
+          type: "technical",
+          interviewer: "Elena Rostova (Senior ML Engineer)",
+          confirmed: false
+        };
+      }
+
+      // Populate Web UI text
+      document.body.setAttribute('data-theme-engine', (state && state.telemetry && state.telemetry.theme) ? state.telemetry.theme : 'purple');
+      document.getElementById('portal-greeting').innerText = `WELCOME, ${activeCandidate.name.toUpperCase()}`;
+      document.getElementById('val-interview-type').innerText = formatInterviewType(activeInterview.type);
+      document.getElementById('val-interviewer').innerText = activeInterview.interviewer;
+      document.getElementById('val-interview-date').innerText = formatDateString(activeInterview.date);
+      document.getElementById('val-interview-time').innerText = `${activeInterview.time} // LCL SYNCHRONOUS`;
+
+      // Set initial status UI
+      updateStatusUI(activeInterview.confirmed);
+
+      /* --- Sound Synthesizer Engine --- */
+      let audioCtx = null;
+      let ambientHumNode = null;
+      let ambientGainNode = null;
+      let sfxEnabled = true;
+
+      function initAudio() {
+        if (audioCtx) return;
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+          
+          const osc1 = audioCtx.createOscillator();
+          const osc2 = audioCtx.createOscillator();
+          const filter = audioCtx.createBiquadFilter();
+          ambientGainNode = audioCtx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(55, audioCtx.currentTime);
+          
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(82.4, audioCtx.currentTime);
+
+          const lfo = audioCtx.createOscillator();
+          const lfoGain = audioCtx.createGain();
+          lfo.frequency.value = 0.15;
+          lfoGain.gain.value = 40;
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(110, audioCtx.currentTime);
+          filter.Q.value = 4;
+
+          lfo.connect(lfoGain);
+          lfoGain.connect(filter.frequency);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          
+          ambientGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+          filter.connect(ambientGainNode);
+          ambientGainNode.connect(audioCtx.destination);
+
+          osc1.start();
+          osc2.start();
+          lfo.start();
+
+          ambientHumNode = { osc1, osc2, lfo, filter };
+          
+          // Fade in drone hum
+          ambientGainNode.gain.linearRampToValueAtTime(0.20, audioCtx.currentTime + 1.5);
+        } catch (e) {
+          console.warn("Audio initialization failed:", e);
+        }
+      }
+
+      function playBeep(type) {
+        if (!sfxEnabled) return;
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          const now = audioCtx.currentTime;
+
+          if (type === 'hover') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1400, now);
+            osc.frequency.exponentialRampToValueAtTime(1900, now + 0.05);
+            gain.gain.setValueAtTime(0.015, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+          } else if (type === 'click') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+            osc.start(now);
+            osc.stop(now + 0.12);
+          } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now); // B5
+            osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.setValueAtTime(0.04, now + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+          }
+        } catch (e) {
+          console.warn("SFX failed to play:", e);
+        }
+      }
+
+      /* --- Audio Authorization Modal Event Listeners --- */
+      const audioModal = document.getElementById('audio-auth-modal');
+      document.getElementById('btn-audio-enable').addEventListener('click', () => {
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        audioModal.classList.add('hidden');
+        playBeep('success');
+      });
+
+      document.getElementById('btn-audio-skip').addEventListener('click', () => {
+        sfxEnabled = false;
+        audioModal.classList.add('hidden');
+      });
+
+      // Show audio authorization modal
+      setTimeout(() => {
+        audioModal.classList.remove('hidden');
+      }, 100);
+
+      /* --- Calibration Confirmation Action --- */
+      const btnCalibrate = document.getElementById('btn-calibrate-sync');
+      btnCalibrate.addEventListener('click', () => {
+        if (activeInterview.confirmed) return; // already calibrated
+
+        playBeep('success');
+        activeInterview.confirmed = true;
+        
+        // Sync back to local storage state if possible
+        if (state) {
+          const matchIdx = state.interviews.findIndex(i => i.id === activeInterview.id);
+          if (matchIdx !== -1) {
+            state.interviews[matchIdx] = activeInterview;
+            localStorage.setItem('internflow_state', JSON.stringify(state));
+          }
+        }
+
+        updateStatusUI(true);
+      });
+
+      btnCalibrate.addEventListener('mouseenter', () => {
+        if (!activeInterview.confirmed) {
+          playBeep('hover');
+        }
+      });
+
+      document.getElementById('btn-back-dashboard').addEventListener('mouseenter', () => {
+        playBeep('hover');
+      });
+
+      function updateStatusUI(confirmed) {
+        const badge = document.getElementById('status-badge');
+        const badgeText = document.getElementById('status-text');
+        const syncStateText = document.getElementById('val-sync-state');
+
+        if (confirmed) {
+          badge.className = "portal-status-badge status-confirmed";
+          badgeText.innerText = "CALIBRATION SYNCED";
+          syncStateText.innerText = "SYNCHRONIZED (CONFIRMED)";
+          syncStateText.className = "portal-value highlight-teal";
+          
+          btnCalibrate.className = "btn-neon btn-block btn-calibrate calibrated";
+          btnCalibrate.innerHTML = '<i data-lucide="check-circle-2"></i> NEURO-SYNC CORE CALIBRATED';
+          btnCalibrate.disabled = true;
+        } else {
+          badge.className = "portal-status-badge status-pending";
+          badgeText.innerText = "PENDING NEURO-CALIBRATION";
+          syncStateText.innerText = "OFFLINE (UNCONFIRMED)";
+          syncStateText.className = "portal-value";
+          
+          btnCalibrate.className = "btn-neon btn-block btn-calibrate";
+          btnCalibrate.innerHTML = '<i data-lucide="refresh-cw" class="icon-spin-hover"></i> CALIBRATE NEURO-SYNC CORE';
+          btnCalibrate.disabled = false;
+        }
+        
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      }
+
+      /* --- Space Parallax Canvas (Reused logic for perfect consistency) --- */
+      const spaceCanvas = document.getElementById('space-canvas');
+      const spaceCtx = spaceCanvas.getContext('2d');
+      let stars = [];
+      let spaceWidth = 0;
+      let spaceHeight = 0;
+      let mousePosition = { x: -1000, y: -1000 };
+
+      function resizeSpaceCanvas() {
+        spaceWidth = window.innerWidth;
+        spaceHeight = window.innerHeight;
+        spaceCanvas.width = spaceWidth;
+        spaceCanvas.height = spaceHeight;
+        generateStars();
+      }
+
+      function generateStars() {
+        stars = [];
+        const starCount = Math.floor((spaceWidth * spaceHeight) / 5000);
+        for (let i = 0; i < starCount; i++) {
+          stars.push({
+            x: Math.random() * spaceWidth,
+            y: Math.random() * spaceHeight,
+            size: 0.4 + Math.random() * 1.5,
+            speed: 0.02 + Math.random() * 0.15,
+            depth: 0.1 + Math.random() * 0.9,
+            alpha: 0.2 + Math.random() * 0.8,
+            glow: Math.random() > 0.8
+          });
+        }
+      }
+
+      window.addEventListener('resize', resizeSpaceCanvas);
+      resizeSpaceCanvas();
+
+      window.addEventListener('mousemove', (e) => {
+        mousePosition.x = e.clientX;
+        mousePosition.y = e.clientY;
+      });
+
+      let tick = 0;
+      const card = document.getElementById('card-portal');
+
+      function animationLoop() {
+        tick++;
+        spaceCtx.clearRect(0, 0, spaceWidth, spaceHeight);
+
+        // Theme colors lookup
+        const computedStyle = getComputedStyle(document.body);
+        const neonPrimary = computedStyle.getPropertyValue('--neon-primary').trim();
+        const neonSecondary = computedStyle.getPropertyValue('--neon-secondary').trim();
+
+        // Nebula Gradient background
+        const fillGlow = spaceCtx.createRadialGradient(
+          spaceWidth * 0.5, spaceHeight * 0.5, 10,
+          spaceWidth * 0.5, spaceHeight * 0.5, Math.max(spaceWidth, spaceHeight) * 0.8
+        );
+        fillGlow.addColorStop(0, 'transparent');
+        fillGlow.addColorStop(0.3, neonPrimary + `04`);
+        fillGlow.addColorStop(0.6, neonSecondary + `02`);
+        fillGlow.addColorStop(1, 'transparent');
+        spaceCtx.fillStyle = fillGlow;
+        spaceCtx.fillRect(0, 0, spaceWidth, spaceHeight);
+
+        // Draw stars
+        stars.forEach(star => {
+          star.y += star.speed * 0.5;
+          if (star.y > spaceHeight) {
+            star.y = -10;
+            star.x = Math.random() * spaceWidth;
+          }
+
+          const maxDisplace = 35 * star.depth;
+          const mouseDisplaceX = ((mousePosition.x / spaceWidth) - 0.5) * maxDisplace;
+          const mouseDisplaceY = ((mousePosition.y / spaceHeight) - 0.5) * maxDisplace;
+          
+          const drawX = star.x + mouseDisplaceX;
+          const drawY = star.y + mouseDisplaceY;
+
+          let twinkleAlpha = star.alpha;
+          if (star.glow) {
+            twinkleAlpha = star.alpha * (0.6 + Math.sin(tick * 0.05 + star.size) * 0.4);
+          }
+
+          spaceCtx.fillStyle = `rgba(255, 255, 255, ${twinkleAlpha})`;
+          spaceCtx.beginPath();
+          spaceCtx.arc(drawX, drawY, star.size, 0, Math.PI * 2);
+          spaceCtx.fill();
+        });
+
+        // 3D Card Bobbing effect (Zero Gravity Simulation)
+        const bobX = Math.sin(tick * 0.012) * 5;
+        const bobY = Math.cos(tick * 0.015) * 6;
+        const tiltX = card.dataset.tiltX || 0;
+        const tiltY = card.dataset.tiltY || 0;
+        card.style.transform = `translate3d(${bobX}px, ${bobY}px, 0) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${card.dataset.scale || 1})`;
+
+        requestAnimationFrame(animationLoop);
+      }
+      requestAnimationFrame(animationLoop);
+
+      /* --- 3D Parallax Tilt Logic on Card --- */
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const px = (x / rect.width) - 0.5;
+        const py = (y / rect.height) - 0.5;
+        
+        card.dataset.tiltX = -py * 6;
+        card.dataset.tiltY = px * 6;
+        card.dataset.scale = 1.015;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.dataset.tiltX = 0;
+        card.dataset.tiltY = 0;
+        card.dataset.scale = 1.0;
+      });
+
+      /* --- Formatter Helpers --- */
+      function formatInterviewType(type) {
+        if (type === 'technical') return 'TECHNICAL CODING SESSION';
+        if (type === 'system-design') return 'SYSTEM DESIGN & AI ARCHITECTURE';
+        if (type === 'behavioral') return 'CULTURE ALIGNMENT & BEHAVIORAL';
+        return type.toUpperCase();
+      }
+
+      function formatDateString(dateStr) {
+        try {
+          const parts = dateStr.split('-');
+          const date = new Date(parts[0], parts[1] - 1, parts[2]);
+          const options = { month: 'long', day: 'numeric', year: 'numeric' };
+          return date.toLocaleDateString('en-US', options).toUpperCase();
+        } catch (e) {
+          return dateStr.toUpperCase();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

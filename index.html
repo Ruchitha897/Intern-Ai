@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Intern Flow AI - Interactive Futuristic Zero-Gravity Holographic Dashboard">
+  <title>Intern Flow AI // Holographic Control Core</title>
+  <!-- Google Fonts: Orbitron for futuristic titles, Outfit for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Canvas for Stars, Parallax Dust, and Orbiting Icons -->
+  <canvas id="space-canvas"></canvas>
+
+  <!-- Background Canvas for Pulsing Data Tethers -->
+  <canvas id="tether-canvas"></canvas>
+
+  <!-- Scanlines & Vignette Layer for CRT Hologram Look -->
+  <div class="hologram-overlay"></div>
+
+  <!-- Audio Initialization Overlay (for browser security compliance) -->
+  <div id="audio-auth-modal" class="audio-modal hidden">
+    <div class="audio-modal-content">
+      <i data-lucide="radio" class="audio-pulse-icon"></i>
+      <h2>Initialize Neuro-Audio Core?</h2>
+      <p>Activate synthesized deep space ambience and micro-interaction sound effects.</p>
+      <div class="audio-modal-buttons">
+        <button id="btn-audio-enable" class="btn-neon">INITIALIZE WITH AUDIO</button>
+        <button id="btn-audio-skip" class="btn-neon btn-secondary">MUTE MODE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Container -->
+  <div class="app-container">
+    
+    <!-- Top Futuristic Header -->
+    <header class="main-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <i data-lucide="cpu" class="logo-icon pulsing-glow"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="glow-text">INTER FLOW AI</h1>
+          <span class="sub-brand">HOLOGRAPHIC CORE v2.8</span>
+        </div>
+      </div>
+
+      <!-- Header Right Container (Telemetry + Git Link) -->
+      <div class="header-right">
+        <!-- Live Telemetry Status Indicators -->
+        <div class="header-telemetry">
+          <div class="tel-item">
+            <span class="tel-label">CORE STATE</span>
+            <span class="tel-value status-active" id="val-core-state"><span class="pulse-dot"></span>ONLINE</span>
+          </div>
+          <div class="tel-item">
+            <span class="tel-label">GRAVITY LEVEL</span>
+            <span class="tel-value" id="val-gravity-level">0.12 G</span>
+          </div>
+          <div class="tel-item">
+            <span class="tel-label">SYNC RATE</span>
+            <span class="tel-value" id="val-sync-rate">99.8%</span>
+          </div>
+          <div class="tel-item">
+            <span class="tel-label">LATENCY</span>
+            <span class="tel-value" id="val-latency">4 ms</span>
+          </div>
+        </div>
+
+        <!-- GitHub Integration Link -->
+        <a href="https://github.com" target="_blank" class="btn-git" id="btn-github-link">
+          <i data-lucide="github" class="git-icon"></i>
+          <span>GITHUB</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Grid Layout -->
+    <main class="dashboard-grid">
+
+      <!-- LEFT SIDEBAR: Pipeline and Assistant -->
+      <div class="grid-column left-column">
+        
+        <!-- Applicant Pipeline Tracker Widget -->
+        <section class="dashboard-card floating-card" id="card-pipeline" data-bob-phase="0">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="users-round" class="card-icon"></i>
+              <h2>APPLICANT PIPELINE</h2>
+            </div>
+            <span class="card-tag">LIVE SYNC</span>
+          </div>
+          
+          <div class="card-body">
+            <!-- Pipeline Board Stage Headers -->
+            <div class="pipeline-stages">
+              <button class="stage-tab active" data-stage="applied" id="stage-tab-applied">APPLIED <span class="badge">4</span></button>
+              <button class="stage-tab" data-stage="screening" id="stage-tab-screening">SCREENING <span class="badge">3</span></button>
+              <button class="stage-tab" data-stage="interview" id="stage-tab-interview">INTERVIEW <span class="badge">2</span></button>
+              <button class="stage-tab" data-stage="offer" id="stage-tab-offer">OFFER <span class="badge">1</span></button>
+            </div>
+
+            <!-- Pipeline Candidates Container -->
+            <div class="pipeline-list scrollable" id="pipeline-candidates">
+              <!-- Dynamically populated via app.js -->
+            </div>
+
+            <!-- Candidate detail preview inside tracker card -->
+            <div class="candidate-details-pane hidden" id="candidate-detail-pane">
+              <div class="pane-header">
+                <h3 id="detail-name">Candidate Name</h3>
+                <button class="btn-close" id="btn-close-detail">&times;</button>
+              </div>
+              <div class="pane-content">
+                <div class="detail-row">
+                  <span class="detail-label">Role:</span>
+                  <span class="detail-value" id="detail-role">Software Engineer</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Score:</span>
+                  <span class="detail-value text-neon-cyan" id="detail-score">95%</span>
+                </div>
+                <p class="detail-summary" id="detail-summary-text">Short summary of capabilities...</p>
+                <div class="pane-actions">
+                  <button class="btn-neon btn-sm" id="btn-promote-candidate">PROMOTE STAGE</button>
+                  <button class="btn-neon btn-secondary btn-sm" id="btn-reject-candidate">REJECT</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-glow"></div>
+        </section>
+
+        <!-- AI Talent Assistant Widget -->
+        <section class="dashboard-card floating-card" id="card-assistant" data-bob-phase="1.5">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="sparkles" class="card-icon text-neon-pink"></i>
+              <h2>AI TALENT ASSISTANT</h2>
+            </div>
+            <span class="card-tag tag-pink">CO-PILOT</span>
+          </div>
+
+          <div class="card-body flex-col">
+            <!-- Active Candidate Info -->
+            <div class="assistant-candidate-selector">
+              <span class="assistant-label">ANALYSIS TARGET</span>
+              <select id="assistant-candidate-select" class="neon-select">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <!-- Tab System -->
+            <div class="assistant-tabs">
+              <button class="assistant-tab active" data-assistant-tab="skills" id="tab-skills">SKILLS RADAR</button>
+              <button class="assistant-tab" data-assistant-tab="summary" id="tab-summary">AI INSIGHTS</button>
+              <button class="assistant-tab" data-assistant-tab="questions" id="tab-questions">INTERVIEW Q's</button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div class="assistant-panel active" id="panel-skills">
+              <div class="radar-chart-container">
+                <!-- Dynamic SVG Radar Chart -->
+                <svg id="radar-svg" viewBox="0 0 200 200">
+                  <!-- Radar polygon and grid will be drawn via app.js -->
+                </svg>
+              </div>
+            </div>
+
+            <div class="assistant-panel scrollable" id="panel-summary">
+              <div class="ai-insight-box">
+                <div class="insight-header">
+                  <i data-lucide="shield-check" class="text-neon-cyan"></i>
+                  <h4>Core Strengths</h4>
+                </div>
+                <ul id="insight-strengths-list">
+                  <!-- Filled by JS -->
+                </ul>
+              </div>
+              <div class="ai-insight-box mt-10">
+                <div class="insight-header">
+                  <i data-lucide="alert-triangle" class="text-neon-pink"></i>
+                  <h4>Potential Risks</h4>
+                </div>
+                <ul id="insight-risks-list">
+                  <!-- Filled by JS -->
+                </ul>
+              </div>
+            </div>
+
+            <div class="assistant-panel scrollable" id="panel-questions">
+              <div class="questions-header-bar">
+                <span>AI-Generated Prompts</span>
+                <button class="btn-neon btn-sm" id="btn-regenerate-questions">
+                  <i data-lucide="refresh-cw" class="icon-spin-hover"></i> REGEN
+                </button>
+              </div>
+              <div class="questions-list" id="ai-questions-container">
+                <!-- Filled by JS -->
+              </div>
+            </div>
+
+          </div>
+          <div class="card-footer-glow"></div>
+        </section>
+
+      </div>
+
+      <!-- CENTER CORE: Interactive Neural AI Brain -->
+      <div class="grid-column center-column">
+        <div class="central-core-container">
+          <div class="core-rings">
+            <div class="ring outer-ring"></div>
+            <div class="ring mid-ring"></div>
+            <div class="ring inner-ring"></div>
+          </div>
+          
+          <div class="brain-canvas-container">
+            <canvas id="neural-canvas" width="400" height="400"></canvas>
+          </div>
+
+          <div class="core-hud">
+            <div class="hud-stat">
+              <span class="hud-label">COGNITIVE INDEX</span>
+              <span class="hud-value numeric-glow" id="hud-cognitive-index">894.2 TFLOPs</span>
+            </div>
+            <div class="hud-title">
+              <div class="pulse-ring"></div>
+              <span>NEURAL HUB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR: Scheduler and Communication Hub -->
+      <div class="grid-column right-column">
+
+        <!-- Calendar & Interview Scheduler Widget -->
+        <section class="dashboard-card floating-card" id="card-scheduler" data-bob-phase="3">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="calendar" class="card-icon text-neon-teal"></i>
+              <h2>INTERVIEW SCHEDULER</h2>
+            </div>
+            <span class="card-tag tag-teal">CALENDAR</span>
+          </div>
+
+          <div class="card-body">
+            <!-- Calendar Mini View -->
+            <div class="calendar-wrapper">
+              <div class="calendar-header">
+                <span id="calendar-month-year">JUNE 2026</span>
+                <div class="cal-nav">
+                  <button id="cal-prev" class="btn-icon">&lt;</button>
+                  <button id="cal-next" class="btn-icon">&gt;</button>
+                </div>
+              </div>
+              <div class="calendar-grid" id="calendar-grid-days">
+                <!-- Dynamic days header and dates populated in app.js -->
+              </div>
+            </div>
+
+            <!-- List of interviews for selected day -->
+            <div class="upcoming-interviews-pane">
+              <h3>SCHEDULED FOR TODAY</h3>
+              <div class="interview-list scrollable" id="scheduled-interviews-list">
+                <!-- Populated via JS -->
+              </div>
+              <button class="btn-neon btn-block" id="btn-open-schedule-modal">
+                <i data-lucide="plus-circle"></i> NEW INTERVIEW
+              </button>
+            </div>
+          </div>
+          <div class="card-footer-glow"></div>
+        </section>
+
+        <!-- Communication Hub (Inbox) Widget -->
+        <section class="dashboard-card floating-card" id="card-inbox" data-bob-phase="4.5">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="message-square-code" class="card-icon text-neon-purple"></i>
+              <h2>COMMUNICATION HUB</h2>
+            </div>
+            <span class="card-tag tag-purple">INBOX</span>
+          </div>
+
+          <div class="card-body flex-col">
+            <!-- Email list pane -->
+            <div class="email-list scrollable" id="email-threads-container">
+              <!-- Populated via JS -->
+            </div>
+
+            <!-- AI response drafting interface -->
+            <div class="ai-draft-interface hidden" id="ai-draft-interface">
+              <div class="draft-header">
+                <span>AI SMART DRAFT</span>
+                <span class="draft-status" id="draft-typing-indicator"><span class="dot-blink"></span> Drafting...</span>
+              </div>
+              <div class="draft-preview scrollable" id="draft-preview-box">
+                <!-- Text will type out here dynamically -->
+              </div>
+              <div class="draft-actions">
+                <button class="btn-neon btn-sm" id="btn-send-draft">SEND DRAFT</button>
+                <button class="btn-neon btn-secondary btn-sm" id="btn-discard-draft">RE-DRAFT</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-glow"></div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Interactive Schedule Modal -->
+    <div id="schedule-modal" class="modal-overlay hidden">
+      <div class="modal-content glass-modal">
+        <div class="modal-header">
+          <h2><i data-lucide="calendar-plus" class="text-neon-teal"></i> SCHEDULE INTERVIEW</h2>
+          <button class="btn-close" id="btn-close-modal">&times;</button>
+        </div>
+        <form id="schedule-form" class="modal-form">
+          <div class="form-group">
+            <label for="sched-candidate">Candidate</label>
+            <select id="sched-candidate" class="neon-input" required>
+              <!-- Filled via JS -->
+            </select>
+          </div>
+          <div class="form-group-row">
+            <div class="form-group flex-1">
+              <label for="sched-date">Date</label>
+              <input type="date" id="sched-date" class="neon-input" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="sched-time">Time</label>
+              <input type="time" id="sched-time" class="neon-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sched-interviewer">Interviewer</label>
+            <input type="text" id="sched-interviewer" class="neon-input" placeholder="e.g. Elena Rostova (Senior ML Engineer)" required>
+          </div>
+          <div class="form-group">
+            <label for="sched-type">Interview Type</label>
+            <select id="sched-type" class="neon-input">
+              <option value="technical">Technical Coding Session</option>
+              <option value="system-design">System Design & AI Architecture</option>
+              <option value="behavioral">Culture Alignment & Behavioral</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-neon btn-block mt-10">GENERATE SCHEDULE PORTAL</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Link Generated Modal -->
+    <div id="link-generated-modal" class="modal-overlay hidden">
+      <div class="modal-content glass-modal border-neon-primary">
+        <div class="modal-header">
+          <h2><i data-lucide="link" class="text-neon-cyan"></i> PORTAL LINK GENERATED</h2>
+          <button class="btn-close" id="btn-close-link-modal">&times;</button>
+        </div>
+        <div class="modal-form">
+          <p class="detail-label text-sm" style="color: var(--text-muted); line-height: 1.4;">
+            The interactive portal for the candidate has been generated. Share the website link below to invite them to calibrate their schedule node.
+          </p>
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="generated-portal-url">PORTAL WEBSITE LINK</label>
+            <div class="form-group-row" style="gap: 8px;">
+              <input type="text" id="generated-portal-url" class="neon-input flex-1 font-mono text-ellipsis" readonly value="" style="border-color: var(--neon-primary); font-size: 0.75rem;">
+              <button id="btn-copy-portal-link" class="btn-neon" style="padding: 8px 12px; min-width: 90px;">
+                <i data-lucide="copy"></i> COPY
+              </button>
+            </div>
+          </div>
+          <div class="form-group-row" style="gap: 10px; margin-top: 10px;">
+            <a id="btn-open-portal-link" href="" target="_blank" class="btn-neon btn-secondary flex-1 no-underline" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <i data-lucide="external-link"></i> OPEN PORTAL
+            </a>
+            <button id="btn-close-link-generated" class="btn-neon flex-1">
+              DONE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Bottom Telemetry & Environment Control Panel -->
+    <footer class="telemetry-footer">
+      <div class="control-panel-label">
+        <i data-lucide="sliders-horizontal" class="pulsing-glow"></i>
+        <span>TELEMETRY & ENVIRONMENTAL CORE CONTROLS</span>
+      </div>
+
+      <div class="telemetry-controls">
+        <!-- Theme selectors -->
+        <div class="control-group">
+          <span class="control-label">THEME ENGINE</span>
+          <div class="theme-buttons">
+            <button class="theme-btn active" data-theme="purple" id="btn-theme-purple">COSMIC</button>
+            <button class="theme-btn" data-theme="cyber" id="btn-theme-cyber">CYBER</button>
+            <button class="theme-btn" data-theme="solar" id="btn-theme-solar">SOLAR</button>
+          </div>
+        </div>
+
+        <!-- Gravity Slider -->
+        <div class="control-group slider-group">
+          <div class="slider-label-row">
+            <span class="control-label">GRAVITY FORCE (BOB SPEED)</span>
+            <span class="control-val-display" id="disp-gravity-speed">0.12G</span>
+          </div>
+          <input type="range" id="slider-gravity" min="0" max="100" value="40" class="neon-slider">
+        </div>
+
+        <!-- Nebula Cloud Intensity Slider -->
+        <div class="control-group slider-group">
+          <div class="slider-label-row">
+            <span class="control-label">NEBULA INTRUSION</span>
+            <span class="control-val-display" id="disp-nebula-intensity">65%</span>
+          </div>
+          <input type="range" id="slider-nebula" min="0" max="100" value="65" class="neon-slider">
+        </div>
+
+        <!-- Orbit Speed Slider -->
+        <div class="control-group slider-group">
+          <div class="slider-label-row">
+            <span class="control-label">ORBIT ROTATION</span>
+            <span class="control-val-display" id="disp-orbit-speed">1.5x</span>
+          </div>
+          <input type="range" id="slider-orbit" min="0" max="100" value="50" class="neon-slider">
+        </div>
+
+        <!-- Sound Toggle Switches -->
+        <div class="control-group toggle-group">
+          <span class="control-label">AMBIENT DRONE</span>
+          <label class="neon-switch">
+            <input type="checkbox" id="toggle-ambient-hum">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="control-group toggle-group">
+          <span class="control-label">NEON BEEPS</span>
+          <label class="neon-switch">
+            <input type="checkbox" id="toggle-sfx" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
